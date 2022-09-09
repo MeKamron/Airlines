@@ -1,0 +1,8 @@
+venv
+db.sqlite3
+.idea
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
