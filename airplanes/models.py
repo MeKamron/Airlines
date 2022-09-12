@@ -1,6 +1,8 @@
-import math
-
 from django.db import models
+
+from .services import (calculate_total_fuel_consumption,
+                       calculate_max_flight_length,
+                       calculate_fuel_tank_capacity)
 
 
 class Airplane(models.Model):
@@ -16,28 +18,19 @@ class Airplane(models.Model):
 
     @property
     def fuel_tank_capacity(self) -> int:
-        return 200 * self.id
+        return calculate_fuel_tank_capacity(self.id)
 
     @property
-    def base_fuel_consumption_per_minute(self) -> float:
-        """
-        How much fuel consumed per minute when flying without passengers
-        """
-        return math.log(self.id) * 0.8
-
-    @property
-    def total_fuel_consumption_per_minute(self) -> float:
+    def total_fuel_consumption(self) -> float:
         """
         Total amount of fuel consumed per minute with passengers
-        (each passenger increases fuel consumption by 0.0002 litres)
+        (each passenger increases fuel consumption by certain number of litres)
         """
-        passenger_increase = self.num_of_passengers * 0.0002
-        return round(self.base_fuel_consumption_per_minute + passenger_increase, 2)
+        return calculate_total_fuel_consumption(self.id, self.num_of_passengers)
 
     @property
     def max_mins_to_fly(self) -> float:
         """
         Number of minutes airplane can fly with full tank and full passengers
         """
-        result = self.fuel_tank_capacity / self.total_fuel_consumption_per_minute
-        return round(result, 2)
+        return calculate_max_flight_length(self.fuel_tank_capacity, self.total_fuel_consumption)

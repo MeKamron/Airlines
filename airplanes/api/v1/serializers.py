@@ -12,4 +12,4 @@ class AirplaneSerializer(serializers.ModelSerializer):
 class ReadAirplaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airplane
-        fields = ['id', 'total_fuel_consumption_per_minute', 'max_mins_to_fly']
+        fields = ['id', 'total_fuel_consumption', 'max_mins_to_fly']

@@ -1,8 +1,9 @@
-import math
-
 from django.test import TestCase
 
 from .models import Airplane
+from .services import (calculate_total_fuel_consumption,
+                       calculate_max_flight_length,
+                       calculate_fuel_tank_capacity)
 
 
 class AirplaneTestCase(TestCase):
@@ -10,35 +11,33 @@ class AirplaneTestCase(TestCase):
         Airplane.objects.create(id=10, num_of_passengers=200)
         Airplane.objects.create(id=12, num_of_passengers=400)
 
-    def test_total_fuel_consumption_with_passengers(self) -> None:
+    def test_total_fuel_consumption(self) -> None:
         """
         Ensure total fuel consumption is calculated correctly
         """
         airplane1 = Airplane.objects.get(id=10)
-        total_fuel_consumption = (math.log(airplane1.id) * 0.8) + (airplane1.num_of_passengers * 0.0002)
-        rounded_total_fuel_consumption = round(total_fuel_consumption, 2)
-        self.assertEqual(airplane1.total_fuel_consumption_per_minute, rounded_total_fuel_consumption)
+        total_fuel_consumption1 = calculate_total_fuel_consumption(airplane1.id, airplane1.num_of_passengers)
+        self.assertEqual(airplane1.total_fuel_consumption, total_fuel_consumption1)
 
         airplane2 = Airplane.objects.get(id=12)
-        total_fuel_consumption2 = (math.log(airplane2.id) * 0.8) + (airplane2.num_of_passengers * 0.0002)
-        rounded_total_fuel_consumption = round(total_fuel_consumption2, 2)
-        self.assertEqual(airplane2.total_fuel_consumption_per_minute, rounded_total_fuel_consumption)
+        total_fuel_consumption2 = calculate_total_fuel_consumption(airplane2.id, airplane2.num_of_passengers)
+        self.assertEqual(airplane2.total_fuel_consumption, total_fuel_consumption2)
 
     def test_max_flight_length_with_filled_tank(self) -> None:
         """
         Ensure maximum flight minutes is calculated correctly
         """
         airplane1 = Airplane.objects.get(id=10)
-        total_fuel_consumption = (math.log(airplane1.id) * 0.8) + (airplane1.num_of_passengers * 0.0002)
-        rounded_total_fuel_consumption = round(total_fuel_consumption, 2)
-        max_flight_length = (airplane1.id * 200) / rounded_total_fuel_consumption
-        self.assertEqual(airplane1.max_mins_to_fly, round(max_flight_length, 2))
+        total_fuel_consumption1 = calculate_total_fuel_consumption(airplane1.id, airplane1.num_of_passengers)
+        max_flight_length1 = calculate_max_flight_length(calculate_fuel_tank_capacity(airplane1.id),
+                                                         total_fuel_consumption1)
+        self.assertEqual(airplane1.max_mins_to_fly, max_flight_length1)
 
         airplane2 = Airplane.objects.get(id=12)
-        total_fuel_consumption2 = (math.log(airplane2.id) * 0.8) + (airplane2.num_of_passengers * 0.0002)
-        rounded_total_fuel_consumption = round(total_fuel_consumption2, 2)
-        max_flight_length2 = (airplane2.id * 200) / rounded_total_fuel_consumption
-        self.assertEqual(airplane2.max_mins_to_fly, round(max_flight_length2, 2))
+        total_fuel_consumption2 = calculate_total_fuel_consumption(airplane2.id, airplane2.num_of_passengers)
+        max_flight_length2 = calculate_max_flight_length(calculate_fuel_tank_capacity(airplane2.id),
+                                                         total_fuel_consumption2)
+        self.assertEqual(airplane2.max_mins_to_fly, max_flight_length2)
 
     def test_str_returns_id(self) -> None:
         """
