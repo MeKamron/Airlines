@@ -8,5 +8,6 @@
 3. crete virtual environment in the root directory of the project where `core` dir lies (python3 -m venv venv)
 4. activate the venv
 5. install requirements (`pip3 install -r requirements.txt`)
-6. initial db (`python3 manage.py migrate`)
+6. initialize db (`python3 manage.py migrate`)
 7. run the project (`python3 manage.py runserver`)
+8. swagger url 'swagger/'
